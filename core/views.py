@@ -29,6 +29,9 @@ def signin(request):
         return render(request, 'signin.html')
 
 
+def settings(request):
+    return render(request, 'setting.html')
+
 def signup(request):
     if request.method == 'POST':
         try:
@@ -47,12 +50,16 @@ def signup(request):
                 else:
                     user = User.objects.create_user(username=username, email=email, password=password)
                     user.save()
+
+                    user_login = auth.authenticate(username=username, password = password)
+                    auth.login(request, user_login)
+
                     user_model = User.objects.get(username=username)
                     new_profile = Profile.objects.create(user=user_model, id_user=user_model.id)
                     new_profile.save()
                     messages.info(request, 'Registered successfully')
                     time.sleep(2)
-                    return redirect('signin')
+                    return redirect('settings')
         except ValueError:
             messages.info(request, 'Please enter username, email, and password')
             return redirect('signup')
